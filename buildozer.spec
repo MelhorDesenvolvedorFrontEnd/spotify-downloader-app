@@ -43,5 +43,5 @@ log_level = 2
 # Ignora aviso de root (normal no GitHub Actions)
 warn_on_root = 0
 
-# Opcional: se quiser esconder o status bar (mais imersivo)
-fullscreen = 1
+
+

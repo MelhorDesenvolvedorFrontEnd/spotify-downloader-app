@@ -1,47 +1,28 @@
 [app]
 
-# Nome que aparece no celular
 title = Spotify Downloader
-
-# Nome interno do pacote (minúsculo, sem espaço)
 package.name = spotifydownloader
-
-# Domínio (pode ser qualquer coisa, mas segue esse padrão)
 package.domain = org.josue
 
-# Pasta com o código (raiz do repositório)
 source.dir = .
-
-# Extensões de arquivos que devem ser incluídas no APK
 source.include_exts = py,png,jpg,kv,atlas
 
-# Versão do app (só número, sem comentário na mesma linha!)
 version = 0.1
 
-# Bibliotecas necessárias
 requirements = python3,kivy,spotipy,requests,mutagen
 
-# Permissões que o app precisa
 android.permissions = INTERNET,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE
 
-# Configurações do Android
 android.api = 33
 android.minapi = 21
 android.ndk = 25b
 android.archs = arm64-v8a, armeabi-v7a
 
-# Orientação da tela (portrait = vertical)
 orientation = portrait
 fullscreen = 1
 
-# ÍCONE do app (tem que estar na raiz do repositório)
-icon.filename = %(source.dir)s/icon.png
-
-# Mostra mais detalhes no log (pra debug)
 log_level = 2
-
-# Ignora aviso de root (normal no GitHub Actions)
 warn_on_root = 0
 
-
-
+# Sem ícone por enquanto (pra não dar FileNotFound)
+# icon.filename = %(source.dir)s/icon.png

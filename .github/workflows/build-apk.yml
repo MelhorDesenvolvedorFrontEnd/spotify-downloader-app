@@ -25,17 +25,14 @@ jobs:
     - name: Add PATH
       run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-    - name: Accept licenses and install build-tools
+    - name: Accept licenses and install essentials
       run: |
-        # Cria SDK manualmente
         mkdir -p $HOME/android-sdk/cmdline-tools/latest
         wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline.zip
         unzip -q cmdline.zip -d $HOME/android-sdk/cmdline-tools/latest
         export ANDROID_SDK_ROOT=$HOME/android-sdk
         export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin
-        # Aceita todas licenças
         yes | sdkmanager --licenses
-        # Instala build-tools e platform
         yes | sdkmanager "build-tools;33.0.0" "platforms;android-33" "platform-tools"
 
     - name: Build APK

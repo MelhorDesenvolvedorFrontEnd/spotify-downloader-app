@@ -1,4 +1,4 @@
-name: Build Kivy APK (Docker)
+name: Build Kivy APK
 
 on:
   workflow_dispatch:
@@ -6,15 +6,41 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: quay.io/kivy/buildozer:latest  # imagem Docker oficial com Buildozer + SDK pronto
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Build APK
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Buildozer dependencies
       run: |
-        buildozer -v android debug
+        sudo apt update
+        sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev
+        pip install --upgrade Cython==0.29.37 buildozer
+
+    - name: Add PATH
+      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: Accept SDK licenses and install essentials
+      run: |
+        # Instala sdkmanager manualmente
+        mkdir -p ~/android-sdk/cmdline-tools
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline.zip
+        unzip -q cmdline.zip -d ~/android-sdk/cmdline-tools
+        mv ~/android-sdk/cmdline-tools/cmdline-tools ~/android-sdk/cmdline-tools/latest
+        export ANDROID_SDK_ROOT=~/android-sdk
+        export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin
+        # Aceita todas licenças
+        yes | sdkmanager --licenses
+        # Instala pacotes essenciais
+        yes | sdkmanager "build-tools;33.0.0" "platforms;android-33" "platform-tools"
+
+    - name: Build APK
+      run: buildozer -v android debug
 
     - name: Upload APK
       if: always()

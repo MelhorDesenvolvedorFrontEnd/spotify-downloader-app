@@ -1,8 +1,6 @@
-name: Build Kivy APK
+name: Build Kivy APK Simples
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -10,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout
       uses: actions/checkout@v4
 
     - name: Set up Python
@@ -18,32 +16,32 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install dependencies
+    - name: Install deps
       run: |
         sudo apt update
         sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev
         pip install --upgrade Cython==0.29.37 buildozer
 
-    - name: Add PATH for buildozer
+    - name: Add PATH
       run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-    - name: Accept Android SDK licenses (forçado)
+    - name: Accept licenses and install build-tools
       run: |
-        # Instala sdkmanager e aceita todas as licenças
-        mkdir -p $HOME/android-sdk/cmdline-tools
-        wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
-        unzip -q cmdline-tools.zip -d $HOME/android-sdk/cmdline-tools
-        mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+        # Cria SDK manualmente
+        mkdir -p $HOME/android-sdk/cmdline-tools/latest
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline.zip
+        unzip -q cmdline.zip -d $HOME/android-sdk/cmdline-tools/latest
         export ANDROID_SDK_ROOT=$HOME/android-sdk
-        yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
-        yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.0" "platform-tools" "platforms;android-33"
-        # Aceita também com buildozer
-        yes | buildozer android accept_sdk_license
+        export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin
+        # Aceita todas licenças
+        yes | sdkmanager --licenses
+        # Instala build-tools e platform
+        yes | sdkmanager "build-tools;33.0.0" "platforms;android-33" "platform-tools"
 
     - name: Build APK
       run: buildozer -v android debug
 
-    - name: Upload APK artifact
+    - name: Upload APK
       if: always()
       uses: actions/upload-artifact@v4
       with:
